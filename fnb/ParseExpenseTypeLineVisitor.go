@@ -13,8 +13,8 @@ type ParseExpenseTypeLineVisitor struct {
 
 var paidFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) paid from cheq a/c\.\.([0-9]+).* Ref\.([^\.]*)\.`)
 var reservedForPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) reserved for purchase @ (.+) from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+`)
-var withdrawnFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) withdrawn from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+ @ `)
-var transferredPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) t/fer from .* a/c\.\.([0-9]+) to (.* a/c\.\.[0-9]+) @ `)
+var withdrawnFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) withdrawn from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+ @`)
+var transferredPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) t/fer from .* a/c\.\.([0-9]+) to (.* a/c\.\.[0-9]+) @`)
 
 func extractExpenseFromPattern(expenseType ExpenseType, pattern *regexp.Regexp, line string, randValIndex, descriptionIndex, accountNumIndex int) *Expense {
 	if !pattern.MatchString(line) {
