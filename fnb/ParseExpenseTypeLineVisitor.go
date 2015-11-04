@@ -11,10 +11,11 @@ type ParseExpenseTypeLineVisitor struct {
 	FoundExpenses []*Expense
 }
 
-var paidFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) paid from cheq a/c\.\.([0-9]+).* Ref\.([^\.]*)\.`)
-var reservedForPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) reserved for purchase @ (.+) from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+`)
-var withdrawnFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) withdrawn from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+ @`)
-var transferredPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) t/fer from .* a/c\.\.([0-9]+) to (.* a/c\.\.[0-9]+) @`)
+var paidFromPattern1 = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) paid from [^/]*a/c\.\.([0-9]+) @ [^\.]*\. [^\.]*\. Ref\.([^\.]*)\.`)
+var paidFromPattern2 = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) paid from [^/]*a/c\.\.([0-9]+) @ [^\.]*\. Ref\.([^\.]*)\.`) //When available is not specified
+var reservedForPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) reserved for purchase @ ([^/]*) from cheq a/c\.\.([0-9]+) using card\.\.[0-9]+`)
+var withdrawnFromPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) withdrawn [^/]*a/c\.\.([0-9]+) using card\.\.[0-9]+ @`)
+var transferredPattern = regexp.MustCompile(`R([0-9]+\.[0-9]{2}) t/fer from [^/]*a/c\.\.([0-9]+) to ([^/]*a/c\.\.[0-9]+) @`)
 
 func extractExpenseFromPattern(expenseType ExpenseType, pattern *regexp.Regexp, line string, randValIndex, descriptionIndex, accountNumIndex int) []*Expense {
 	if !pattern.MatchString(line) {
@@ -41,7 +42,10 @@ func extractExpenseFromPattern(expenseType ExpenseType, pattern *regexp.Regexp, 
 }
 
 func (p *ParseExpenseTypeLineVisitor) VisitPaidFrom(paidFrom *PaidFromExpenseType) {
-	if expenses := extractExpenseFromPattern(paidFrom, paidFromPattern, p.stringLine, 1, 3, 2); len(expenses) > 0 {
+	if expenses := extractExpenseFromPattern(paidFrom, paidFromPattern1, p.stringLine, 1, 3, 2); len(expenses) > 0 {
+		p.FoundExpenses = append(p.FoundExpenses, expenses...)
+	}
+	if expenses := extractExpenseFromPattern(paidFrom, paidFromPattern2, p.stringLine, 1, 3, 2); len(expenses) > 0 {
 		p.FoundExpenses = append(p.FoundExpenses, expenses...)
 	}
 }
